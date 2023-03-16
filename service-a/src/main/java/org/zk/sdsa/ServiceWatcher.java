@@ -10,7 +10,7 @@ public class ServiceWatcher implements Watcher {
 
     private ZooKeeper zooKeeper;
     private String serviceName;
-    private String servicePath;
+    private final String servicePath;
     private String serviceInfo;
 
     public ServiceWatcher(String connectString, String serviceName) throws Exception {

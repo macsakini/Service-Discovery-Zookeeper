@@ -5,12 +5,13 @@ package org.zk.sdsa;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+import org.zk.sds.ZookeeperConnection;
 
 import java.util.List;
 
 public class App {
     private static ZooKeeper zk;
-    private static org.zk.sds.ZookeeperConnection conn;
+    private static ZookeeperConnection conn;
     public static void create(String path, byte[] data) throws InterruptedException, KeeperException {
         zk.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     };
@@ -31,7 +32,6 @@ public class App {
         return nodes;
     }
 
-
     public static void main(String[] args) {
         String path = "/service-a";
         byte[] data = "Service-A".getBytes();
@@ -40,10 +40,6 @@ public class App {
             zk = conn.connect("localhost");
             Stat stat = znode_exists(path);
             if(stat != null){
-                System.out.println("Z-node exists");
-                System.out.println(stat.getAversion());
-                List<String> services  = discoverServices("myService");
-                System.out.println("Services found: " + services);
                 Thread.sleep(Long.MAX_VALUE);
             }else{
                 create(path, data);
