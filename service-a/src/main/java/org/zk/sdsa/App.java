@@ -11,7 +11,6 @@ import java.util.List;
 public class App {
     private static ZooKeeper zk;
     private static org.zk.sds.ZookeeperConnection conn;
-
     public static void create(String path, byte[] data) throws InterruptedException, KeeperException {
         zk.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     };
@@ -20,18 +19,13 @@ public class App {
         return zk.exists(path, true);
     }
 
-
     public static List<String> discoverServices(String serviceName) throws InterruptedException, KeeperException {
         List<String> nodes = zk.getChildren("/services",true);
-
         nodes.removeIf(node->!node.startsWith(serviceName));
-
         for(String node: nodes){
             zk.exists("/services/" + node, new Watcher() {
                 @Override
-                public void process(WatchedEvent event) {
-
-                }
+                public void process(WatchedEvent event) {}
             });
         }
         return nodes;
