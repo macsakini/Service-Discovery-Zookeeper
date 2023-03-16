@@ -3,11 +3,10 @@
  */
 package org.zk.sdsa;
 
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+
+import java.util.List;
 
 public class App {
     private static ZooKeeper zk;
@@ -21,6 +20,24 @@ public class App {
         return zk.exists(path, true);
     }
 
+
+    public static List<String> discoverServices(String serviceName) throws InterruptedException, KeeperException {
+        List<String> nodes = zk.getChildren("/services",true);
+
+        nodes.removeIf(node->!node.startsWith(serviceName));
+
+        for(String node: nodes){
+            zk.exists("/services/" + node, new Watcher() {
+                @Override
+                public void process(WatchedEvent event) {
+
+                }
+            });
+        }
+        return nodes;
+    }
+
+
     public static void main(String[] args) {
         String path = "/service-a";
         byte[] data = "Service-A".getBytes();
@@ -31,6 +48,9 @@ public class App {
             if(stat != null){
                 System.out.println("Z-node exists");
                 System.out.println(stat.getAversion());
+                List<String> services  = discoverServices("myService");
+                System.out.println("Services found: " + services);
+                Thread.sleep(Long.MAX_VALUE);
             }else{
                 create(path, data);
             }
@@ -39,6 +59,5 @@ public class App {
             e.printStackTrace();
         }
     }
-
 }
 
